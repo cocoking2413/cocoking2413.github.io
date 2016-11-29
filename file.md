@@ -2,3 +2,4 @@
 2. [nw.js](files/nw.js.md)
 3. [webpack](files/webpack.md)
 4. [electron](files/electron.md)
+5. [wxapp](files/wxapp.md)
