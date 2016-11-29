@@ -6,5 +6,5 @@
 
 1. [ps](files/ps.md)  
 2. [sso](works/sso.md)
-2. [es6](files/es6.md)
-2. [nw.js](files/nw.js.md)
+3. [es6](files/es6.md)
+4. [nw.js](files/nw.js.md)
