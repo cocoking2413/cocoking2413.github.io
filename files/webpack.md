@@ -33,51 +33,53 @@
 
 #### 安装配置
 
-    npm 的形式来安装：`$ npm install webpack -g`  
+1. npm 的形式来安装： 
+    > $ npm install webpack -g   
     
-    每个项目下都必须配置有一个 webpack.config.js ，它的作用如同常规的 gulpfile.js/Gruntfile.js ，就是一个配置项，告诉 webpack 它需要做什么。
+2. 每个项目下都必须配置有一个 webpack.config.js ，它的作用如同常规的 gulpfile.js/Gruntfile.js ，就是一个配置项，告诉 webpack 它需要做什么。  
 
+    var webpack = require('webpack');
+    var commonsPlugin = new webpack.optimize.CommonsChunkPlugin('common.js');
+    
+    module.exports = {
+        //插件项
+        plugins: [commonsPlugin],
+        //页面入口文件配置
+        entry: {
+            index : './src/js/page/index.js'
+        },
+        //入口文件输出配置
+        output: {
+            path: 'dist/js/page',
+            filename: '[name].js'
+        },
+        module: {
+            //加载器配置
+            loaders: [
+                { test: /\.css$/, loader: 'style-loader!css-loader' },
+                { test: /\.js$/, loader: 'jsx-loader?harmony' },
+                { test: /\.scss$/, loader: 'style!css!sass?sourceMap'},
+                { test: /\.(png|jpg)$/, loader: 'url-loader?limit=8192'}
+            ]
+        },
+        //其它解决方案配置
+        resolve: {
+            root: 'E:/github/flux-example/src', //绝对路径
+            extensions: ['', '.js', '.json', '.scss'],
+            alias: {
+                AppStore : 'js/stores/AppStores.js',
+                ActionType : 'js/actions/ActionType.js',
+                AppAction : 'js/actions/AppAction.js'
+            }
+        }
+    };   
 
-            var webpack = require('webpack');
-            var commonsPlugin = new webpack.optimize.CommonsChunkPlugin('common.js');
-            
-            module.exports = {
-                //插件项
-                plugins: [commonsPlugin],
-                //页面入口文件配置
-                entry: {
-                    index : './src/js/page/index.js'
-                },
-                //入口文件输出配置
-                output: {
-                    path: 'dist/js/page',
-                    filename: '[name].js'
-                },
-                module: {
-                    //加载器配置
-                    loaders: [
-                        { test: /\.css$/, loader: 'style-loader!css-loader' },
-                        { test: /\.js$/, loader: 'jsx-loader?harmony' },
-                        { test: /\.scss$/, loader: 'style!css!sass?sourceMap'},
-                        { test: /\.(png|jpg)$/, loader: 'url-loader?limit=8192'}
-                    ]
-                },
-                //其它解决方案配置
-                resolve: {
-                    root: 'E:/github/flux-example/src', //绝对路径
-                    extensions: ['', '.js', '.json', '.scss'],
-                    alias: {
-                        AppStore : 'js/stores/AppStores.js',
-                        ActionType : 'js/actions/ActionType.js',
-                        AppAction : 'js/actions/AppAction.js'
-                    }
-                }
-            };
-1. plugins 是插件项，这里我们使用了一个 CommonsChunkPlugin 的插件，它用于提取多个入口文件的公共脚本部分，然后生成一个 common.js 来方便多页面之间进行复用。
-2. entry 是页面入口文件配置，output 是对应输出项配置（即入口文件最终要生成什么名字的文件、存放到哪里），其语法大致为：
-            {
-                entry: {
-                    page1: "./page1",
+    1. plugins 是插件项，这里我们使用了一个 CommonsChunkPlugin 的插件，它用于提取多个入口文件的公共脚本部分，然后生成一个 common.js 来方便多页面之间进行复用。
+    2. entry 是页面入口文件配置，output 是对应输出项配置（即入口文件最终要生成什么名字的文件、存放到哪里），其语法大致为：  
+ 
+           {  
+                entry: {  
+                    page1: "./page1",  
                     //支持数组形式，将加载数组中的所有模块，但以最后一个模块作为输出
                     page2: ["./entry1", "./entry2"]
                 },
@@ -86,7 +88,9 @@
                     filename: "[name].bundle.js"
                 }
             }
- 3. module.loaders 是最关键的一块配置。它告知 webpack 每一种文件都需要使用什么加载器来处理：
+
+    3. module.loaders 是最关键的一块配置。它告知 webpack 每一种文件都需要使用什么加载器来处理： 
+
             module: {
                     //加载器配置
                     loaders: [
@@ -99,14 +103,16 @@
                         //图片文件使用 url-loader 来处理，小于8kb的直接转为base64
                         { test: /\.(png|jpg)$/, loader: 'url-loader?limit=8192'}
                     ]
-               }
-    如上，"-loader"其实是可以省略不写的，多个loader之间用“!”连接起来。          
-    注意所有的加载器都需要通过 npm 来加载，并建议查阅它们对应的 readme 来看看如何使用。
-    拿最后一个 url-loader 来说，它会将样式中引用到的图片转为模块来处理，使用该加载器需要先进行安装：
-    npm install url-loader -save-dev
-    配置信息的参数“?limit=8192”表示将所有小于8kb的图片都转为base64形式（其实应该说超过8kb的才使用 url-loader 来映射到文件，否则转为data url形式）。
+            }    
+              
+        如上，"-loader"其实是可以省略不写的，多个loader之间用“!”连接起来。          
+        注意所有的加载器都需要通过 npm 来加载，并建议查阅它们对应的 readme 来看看如何使用。
+        拿最后一个 url-loader 来说，它会将样式中引用到的图片转为模块来处理，使用该加载器需要先进行安装：
+        npm install url-loader -save-dev
+        配置信息的参数“?limit=8192”表示将所有小于8kb的图片都转为base64形式（其实应该说超过8kb的才使用 url-loader 来映射到文件，否则转为data url形式）。
 
-4. 最后是 resolve 配置，这块很好理解，直接写注释了：
+    4. 最后是 resolve 配置，这块很好理解，直接写注释了：
+
             resolve: {
                     //查找module的话从这里开始查找
                     root: 'E:/github/flux-example/src', //绝对路径
@@ -118,7 +124,8 @@
                         ActionType : 'js/actions/ActionType.js',
                         AppAction : 'js/actions/AppAction.js'
                     }
-                }                   
+                }  
+                                 
   关于 webpack.config.js 更详尽的配置可以参考[这里](http://webpack.github.io/docs/configuration.html)。
   
 #### 运行
@@ -142,20 +149,12 @@ webpack 的执行也很简单，直接执行
 
 1. HTML  
     直接在页面引入 webpack 最终生成的页面脚本即可，不用再写什么 data-main 或 seajs.use 了：    
-        <!DOCTYPE html>
-        <html>
-        <head lang="en">
-        <meta charset="UTF-8">
-        <title>demo</title>
-        </head>
-        <body>
-        <script src="dist/js/page/common.js"></script>
-        <script src="dist/js/page/index.js"></script>
-        </body>
-        </html>
-   脚本执行时会动态生成<style>并标签打到head里。
   
-  2. js
+     `   <script src="dist/js/page/common.js"></script>
+        <script src="dist/js/page/index.js"></script>
+   `
+  
+2. js
   各脚本模块可以直接使用 commonJS 来书写，并可以直接引入未经编译的模块，比如 JSX、sass、coffee等（只要你在 webpack.config.js 里配置好了对应的加载器）。
 我们再看看编译前的页面入口文件（index.js）：
 
@@ -218,28 +217,23 @@ webpack 的执行也很简单，直接执行
                     new CommonsChunkPlugin("commons.js", ["p1", "p2", "admin-commons.js"])
                 ]
             };
-            // <script>s required:
-            // page1.html: commons.js, p1.js
-            // page2.html: commons.js, p2.js
-            // page3.html: p3.js
-            // admin-page1.html: commons.js, admin-commons.js, ap1.js
-            // admin-page2.html: commons.js, admin-commons.js, ap2.js
+
 
 3. 独立打包样式文件 
   
     有时候可能希望项目的样式能不要被打包到脚本中，而是独立出来作为.css，然后在页面中以<link>标签引入。这时候我们需要 [extract-text-webpack-plugin](https://github.com/webpack/extract-text-webpack-plugin) 来帮忙：
-            var webpack = require('webpack');
-            var commonsPlugin = new webpack.optimize.CommonsChunkPlugin('common.js');
-            var ExtractTextPlugin = require("extract-text-webpack-plugin");
-        
-            module.exports = {
-                plugins: [commonsPlugin, new ExtractTextPlugin("[name].css")],
-                entry: {
-                //...省略其它配置
+    > var webpack = require('webpack');  
+    > var commonsPlugin = new webpack.optimize.CommonsChunkPlugin('common.js');  
+    > var ExtractTextPlugin = require("extract-text-webpack-plugin");  
+    >
+    > module.exports = {  
+    >     plugins: [commonsPlugin, new ExtractTextPlugin("[name].css")],  
+    >     entry: {  
+    >     //...省略其它配置
                 
 4. 使用CDN/远程文件
 
-      有时候我们希望某些模块走CDN并以<script>的形式挂载到页面上来加载，但又希望能在 webpack 的模块中使用上。这时候我们可以在配置文件里使用 externals 属性来帮忙：          
+      有时候我们希望某些模块走CDN并以\<script\>的形式挂载到页面上来加载，但又希望能在 webpack 的模块中使用上。这时候我们可以在配置文件里使用 externals 属性来帮忙：          
             {
                 externals: {
                     // require("jquery") 是引用自外部模块的
@@ -256,21 +250,21 @@ webpack 的执行也很简单，直接执行
                 });
                 
 5. 与 grunt/gulp 配合
-          
-                gulp.task("webpack", function(callback) {
-                    // run webpack
-                    webpack({
-                        // configuration
-                    }, function(err, stats) {
-                        if(err) throw new gutil.PluginError("webpack", err);
-                        gutil.log("[webpack]", stats.toString({
-                            // output options
-                        }));
-                        callback();
-                    });
-                });     
-当然我们只需要把配置写到 webpack({ ... }) 中去即可，无须再写 webpack.config.js 了。
-更多参照信息请参阅：[gulp配置](http://webpack.github.io/docs/usage-with-gulp.html) / [grunt配置](http://webpack.github.io/docs/usage-with-grunt.html) 。 
+            
+    >  gulp.task("webpack", function(callback) {  
+    >      // run webpack  
+    >     webpack({  
+    >        // configuration  
+    >   }, function(err, stats) {  
+    >      if(err) throw new gutil.PluginError("webpack", err);  
+    >     gutil.log("[webpack]", stats.toString({  
+    >        // output options  
+    >   }));  
+    >  callback();  
+    > });  
+    > });         
+    当然我们只需要把配置写到 webpack({ ... }) 中去即可，无须再写 webpack.config.js 了。  
+    更多参照信息请参阅：[gulp配置](http://webpack.github.io/docs/usage-with-gulp.html) / [grunt配置](http://webpack.github.io/docs/usage-with-grunt.html) 。 
             
  6. React 相关
     1. 推荐使用 npm install react 的形式来安装并引用 React 模块，而不是直接使用编译后的 react.js，这样最终编译出来的 React 部分的脚本会减少 10-20 kb左右的大小。
