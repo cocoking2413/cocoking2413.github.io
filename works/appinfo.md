@@ -29,7 +29,7 @@ bll->>s:resultInfo<=insertModel<=updateModel<=parseModel
 s->>c:resultInfo<=sendMsg
 end
 ```
-![img1](https://github.com/cocoking2413/cocoking2413.github.io/blob/master/static/img/2016-12-02_143935.png)
+![img1](https://github.com/cocoking2413/cocoking2413.github.io/blob/master/static/img/2016-12-02_143935.png?raw=true)
 
 
 > ###### start=>c创建请求=>s检查校正数据(1)=>bll解析校正json(2)并转换成可用对象=>bll数据库新增审批记录流转记录（操作日志处理）=>s发送消息=>s返回结果=>c接收创建结果信息=>end
@@ -47,7 +47,7 @@ F-->|true|G{s发送消息}
 G-->|false|K[返回c]
 G-->|true|H[end]
 ```
-![img2](https://github.com/cocoking2413/cocoking2413.github.io/blob/master/static/img/2016-12-02_143803.png)
+![img2](https://github.com/cocoking2413/cocoking2413.github.io/blob/master/static/img/2016-12-02_143803.png?raw=true)
 
 
 #### 几个点
