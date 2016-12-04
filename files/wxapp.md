@@ -16,7 +16,7 @@
 框架可以让数据与视图非常简单地保持同步。当做数据修改的时候，只需要在逻辑层修改数据，视图层就会做相应的更新。
 
 通过这个简单的例子来看：
-
+```
         <!-- This is our View -->
         <view> Hello {{name}}! </view>
         <button bindtap="changeName"> Click me! </button>
@@ -36,6 +36,7 @@
             })
         }
         })
+```        
 开发者通过框架将逻辑层数据中的 name 与视图层的 name 进行了绑定，所以在页面一打开的时候会显示 Hello WeChat!
 当点击按钮的时候，视图层会发送 changeName 的事件给逻辑层，逻辑层找到对应的事件处理函数
 逻辑层执行了 setData 的操作，将 name 从 WeChat 变为 MINA，因为该数据和视图层已经绑定了，从而视图层会自动改变为 Hello MINA! 。

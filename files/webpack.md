@@ -18,7 +18,7 @@
 4. 扩展性强，插件机制完善，特别是支持 React 热插拔（见 react-hot-loader ）的功能让人眼前一亮。
 
 对 webpack 来说，我们可以直接在上面书写 commonJS 形式的语法，无须任何 define （毕竟最终模块都打包在一起，webpack 也会最终自动加上自己的加载器）：
-
+```
             var someModule = require("someModule");
             var anotherModule = require("anotherModule");    
         
@@ -29,15 +29,16 @@
                 someModule.doTehAwesome();
                 anotherModule.doMoarAwesome();
             };
-        
+```        
 
 #### 安装配置
 
-1. npm 的形式来安装： 
-    > $ npm install webpack -g   
-    
+1. npm 的形式来安装：
+```bash 
+     $ npm install webpack -g   
+``` 
 2. 每个项目下都必须配置有一个 webpack.config.js ，它的作用如同常规的 gulpfile.js/Gruntfile.js ，就是一个配置项，告诉 webpack 它需要做什么。  
-
+```
     var webpack = require('webpack');
     var commonsPlugin = new webpack.optimize.CommonsChunkPlugin('common.js');
     
@@ -73,10 +74,10 @@
             }
         }
     };   
-
+```
     1. plugins 是插件项，这里我们使用了一个 CommonsChunkPlugin 的插件，它用于提取多个入口文件的公共脚本部分，然后生成一个 common.js 来方便多页面之间进行复用。
     2. entry 是页面入口文件配置，output 是对应输出项配置（即入口文件最终要生成什么名字的文件、存放到哪里），其语法大致为：  
- 
+``` 
            {  
                 entry: {  
                     page1: "./page1",  
@@ -88,9 +89,9 @@
                     filename: "[name].bundle.js"
                 }
             }
-
+```
     3. module.loaders 是最关键的一块配置。它告知 webpack 每一种文件都需要使用什么加载器来处理： 
-
+```
             module: {
                     //加载器配置
                     loaders: [
@@ -104,7 +105,7 @@
                         { test: /\.(png|jpg)$/, loader: 'url-loader?limit=8192'}
                     ]
             }    
-              
+   ```           
         如上，"-loader"其实是可以省略不写的，多个loader之间用“!”连接起来。          
         注意所有的加载器都需要通过 npm 来加载，并建议查阅它们对应的 readme 来看看如何使用。
         拿最后一个 url-loader 来说，它会将样式中引用到的图片转为模块来处理，使用该加载器需要先进行安装：
@@ -112,7 +113,7 @@
         配置信息的参数“?limit=8192”表示将所有小于8kb的图片都转为base64形式（其实应该说超过8kb的才使用 url-loader 来映射到文件，否则转为data url形式）。
 
     4. 最后是 resolve 配置，这块很好理解，直接写注释了：
-
+```
             resolve: {
                     //查找module的话从这里开始查找
                     root: 'E:/github/flux-example/src', //绝对路径
@@ -125,16 +126,19 @@
                         AppAction : 'js/actions/AppAction.js'
                     }
                 }  
-                                 
+   ```                              
   关于 webpack.config.js 更详尽的配置可以参考[这里](http://webpack.github.io/docs/configuration.html)。
   
 #### 运行
 
 webpack 的执行也很简单，直接执行
+```
         $ webpack --display-error-details
+```        
 即可，后面的参数“--display-error-details”是推荐加上的，方便出错时能查阅更详尽的信息（比如 webpack 寻找模块的过程），从而更好定位到问题。
 
 其他主要的参数有：
+```
         $ webpack --config XXX.js   //使用另一份配置文件（比如webpack.config2.js）来打包
         
         $ webpack --watch   //监听变动并自动打包
@@ -142,22 +146,22 @@ webpack 的执行也很简单，直接执行
         $ webpack -p    //压缩混淆脚本，这个非常非常重要！
         
         $ webpack -d    //生成map映射文件，告知哪些模块被最终打包到哪里了
-        
+```        
 其中的 -p 是很重要的参数，曾经一个未压缩的 700kb 的文件，压缩后直接降到 180kb（主要是样式这块一句就独占一行脚本，导致未压缩脚本变得很大）。
    
 #### 模块引用
 
 1. HTML  
     直接在页面引入 webpack 最终生成的页面脚本即可，不用再写什么 data-main 或 seajs.use 了：    
-  
-     `   <script src="dist/js/page/common.js"></script>
-        <script src="dist/js/page/index.js"></script>
-   `
+```   
+    <script src="dist/js/page/common.js"></script>
+    <script src="dist/js/page/index.js"></script>
+```
   
 2. js
   各脚本模块可以直接使用 commonJS 来书写，并可以直接引入未经编译的模块，比如 JSX、sass、coffee等（只要你在 webpack.config.js 里配置好了对应的加载器）。
 我们再看看编译前的页面入口文件（index.js）：
-
+```
         require('../../css/reset.scss'); //加载初始化样式
         require('../../css/allComponent.scss'); //加载组件样式
         var React = require('react');
@@ -181,25 +185,26 @@ webpack 的执行也很简单，直接执行
         React.render(
             <App />, document.body
         );
-    
+  ```  
 
 #### 其他
 
 1. shimming
 
    在 AMD/CMD 中，我们需要对不符合规范的模块（比如一些直接返回全局变量的插件）进行 shim 处理，这时候我们需要使用 exports-loader 来帮忙：
-   
-   > { test: require.resolve("./src/js/tool/swipe.js"),  loader: "exports?swipe"}
-   
+ ```  
+    { test: require.resolve("./src/js/tool/swipe.js"),  loader: "exports?swipe"}
+ ```  
    之后在脚本中需要引用该模块的时候，这么简单地来使用就可以了：
-   
-   > require('./tool/swipe.js');
-   > swipe(); 
-   
+  ``` 
+    require('./tool/swipe.js');
+    swipe(); 
+  ``` 
 2. 自定义公共模块提取  
 
     在文章开始我们使用了 CommonsChunkPlugin 插件来提取多个页面之间的公共模块，并将该模块打包为 common.js 。
-    但有时候我们希望能更加个性化一些，我们可以这样配置：      
+    但有时候我们希望能更加个性化一些，我们可以这样配置：
+```      
             var CommonsChunkPlugin = require("webpack/lib/optimize/CommonsChunkPlugin");
             module.exports = {
                 entry: {
@@ -217,23 +222,25 @@ webpack 的执行也很简单，直接执行
                     new CommonsChunkPlugin("commons.js", ["p1", "p2", "admin-commons.js"])
                 ]
             };
-
+```
 
 3. 独立打包样式文件 
   
     有时候可能希望项目的样式能不要被打包到脚本中，而是独立出来作为.css，然后在页面中以<link>标签引入。这时候我们需要 [extract-text-webpack-plugin](https://github.com/webpack/extract-text-webpack-plugin) 来帮忙：
-    > var webpack = require('webpack');  
-    > var commonsPlugin = new webpack.optimize.CommonsChunkPlugin('common.js');  
-    > var ExtractTextPlugin = require("extract-text-webpack-plugin");  
-    >
-    > module.exports = {  
-    >     plugins: [commonsPlugin, new ExtractTextPlugin("[name].css")],  
-    >     entry: {  
-    >     //...省略其它配置
-                
+``` 
+     var webpack = require('webpack');  
+     var commonsPlugin = new webpack.optimize.CommonsChunkPlugin('common.js');  
+     var ExtractTextPlugin = require("extract-text-webpack-plugin");  
+    
+     module.exports = {  
+         plugins: [commonsPlugin, new ExtractTextPlugin("[name].css")],  
+         entry: {  
+         //...省略其它配置
+```               
 4. 使用CDN/远程文件
 
       有时候我们希望某些模块走CDN并以\<script\>的形式挂载到页面上来加载，但又希望能在 webpack 的模块中使用上。这时候我们可以在配置文件里使用 externals 属性来帮忙：          
+```         
             {
                 externals: {
                     // require("jquery") 是引用自外部模块的
@@ -241,28 +248,30 @@ webpack 的执行也很简单，直接执行
                     "jquery": "jQuery"
                 }
             }
-            
+```            
       需要留意的是，得确保 CDN 文件必须在 webpack 打包文件引入之前先引入。
       我们倒也可以使用 script.js 在脚本中来加载我们的模块：
+```
             var $script = require("scriptjs");
                 $script("//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js", function() {
                 $('body').html('It works!')
                 });
-                
+ ```               
 5. 与 grunt/gulp 配合
-            
-    >  gulp.task("webpack", function(callback) {  
-    >      // run webpack  
-    >     webpack({  
-    >        // configuration  
-    >   }, function(err, stats) {  
-    >      if(err) throw new gutil.PluginError("webpack", err);  
-    >     gutil.log("[webpack]", stats.toString({  
-    >        // output options  
-    >   }));  
-    >  callback();  
-    > });  
-    > });         
+ ```           
+      gulp.task("webpack", function(callback) {  
+          // run webpack  
+         webpack({  
+            // configuration  
+       }, function(err, stats) {  
+          if(err) throw new gutil.PluginError("webpack", err);  
+         gutil.log("[webpack]", stats.toString({  
+            // output options  
+       }));  
+      callback();  
+     });  
+     });   
+```          
     当然我们只需要把配置写到 webpack({ ... }) 中去即可，无须再写 webpack.config.js 了。  
     更多参照信息请参阅：[gulp配置](http://webpack.github.io/docs/usage-with-gulp.html) / [grunt配置](http://webpack.github.io/docs/usage-with-grunt.html) 。 
             
